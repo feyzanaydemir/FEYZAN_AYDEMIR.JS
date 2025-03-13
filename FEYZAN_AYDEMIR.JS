@@ -12,31 +12,35 @@
         }
 
         buildHTML();
+        buildSlides();
         buildCSS();
         setEvents();
+    }
+        
 
-        // toggle favorite and update localStorage
-        function toggleFavorite(element) {
-            const mightLikeProducts = JSON.parse(localStorage.getItem('mightLikeProducts'))
-            const i = parseInt(element.id.split('might-like-product-')[1], 10) - 1;
-            if ('favorite' in mightLikeProducts[i]) {
-                mightLikeProducts[i].favorite = !mightLikeProducts[i].favorite;
-            } else {
-                mightLikeProducts[i].favorite = true;
-            }
-
-            localStorage.setItem('mightLikeProducts', JSON.stringify(mightLikeProducts));
-
-            const svgPath = element.querySelector('svg path');
-            if (mightLikeProducts[i].favorite) {
-                svgPath.setAttribute('fill', '#193db0');
-                svgPath.setAttribute('stroke', '#193db0');
-            } else {
-                svgPath.setAttribute('fill', 'none');
-                svgPath.setAttribute('stroke', '#555');
-            }
+    // toggle favorite and update localStorage
+    function toggleFavorite(element) {
+        const mightLikeProducts = JSON.parse(localStorage.getItem('mightLikeProducts'))
+        const i = parseInt(element.id.split('might-like-product-')[1], 10) - 1;
+        if ('favorite' in mightLikeProducts[i]) {
+            mightLikeProducts[i].favorite = !mightLikeProducts[i].favorite;
+        } else {
+            mightLikeProducts[i].favorite = true;
         }
 
+        localStorage.setItem('mightLikeProducts', JSON.stringify(mightLikeProducts));
+
+        const svgPath = element.querySelector('svg path');
+        if (mightLikeProducts[i].favorite) {
+            svgPath.setAttribute('fill', '#193db0');
+            svgPath.setAttribute('stroke', '#193db0');
+        } else {
+            svgPath.setAttribute('fill', 'none');
+            svgPath.setAttribute('stroke', '#555');
+        }
+    }
+
+    function buildSlides() {
         const mightLikeProducts = JSON.parse(localStorage.getItem('mightLikeProducts')) || [];
         const mightLikeSliderTray = document.getElementsByClassName('might-like-slider-tray')[0];
         mightLikeProducts.forEach(product => {
@@ -79,7 +83,7 @@
                 toggleFavorite(event.target.closest('.might-like-product-button'));
             }
         });
-    };
+    }
 
     const buildHTML = () => {
         const html = `
@@ -88,7 +92,7 @@
                     <div class="might-like-carousel-container">
                         <p class="might-like-products-title">You Might Also Like</p>
                         <div class="might-like-carousel-padded">
-                            <button type="button" aria-label="previous" class="might-like-carousel-button-left" disabled>
+                            <button id="might-like-previous" type="button" aria-label="previous" class="might-like-carousel-button-left" disabled>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14.242" height="24.242" viewBox="0 0 14.242 24.242"><path fill="none" stroke="#333" stroke-linecap="round" stroke-width="3px" d="M2106.842 2395.467l-10 10 10 10" transform="translate(-2094.721 -2393.346)"></path></svg>
                             </button>
                             <div class="might-like-slider">
@@ -96,7 +100,7 @@
                                     <div class="might-like-slider-tray"></div>
                                 </div>
                             </div>
-                            <button type="button" aria-label="next" class="might-like-carousel-button-right" disabled>
+                            <button id="might-like-next" type="button" aria-label="next" class="might-like-carousel-button-right" disabled>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14.242" height="24.242" viewBox="0 0 14.242 24.242"><path fill="none" stroke="#333" stroke-linecap="round" stroke-width="3px" d="M2106.842 2395.467l-10 10 10 10" transform="translate(-2094.721 -2393.346)"></path></svg>
                             </button>
                         </div>
@@ -161,12 +165,12 @@
                 align-items: stretch;
                 width: 386.323%;
                 flex-direction: row;
-
+ 
                 list-style: none;
                 padding: 0;
                 margin: 0;
             }
-
+ 
             .might-like-product-slide {
                 width: 6.66667%;
                 padding-bottom: unset;
@@ -297,10 +301,21 @@
     };
 
     const setEvents = () => {
-        $('').on('click', () => {
-            console.log('clicked');
+        const clamp = (x) => Math.max(0, Math.min(x, $('.might-like-slider-tray')[0].scrollWidth - $('.might-like-slider-tray')[0].clientWidth));
+
+        $('#might-like-previous').on("click", (e) => {
+            let current = $('.might-like-slider-tray').scrollLeft();
+            current = clamp(current - 200);
+            $('.might-like-slider-tray').scrollLeft(current);
         });
-    };
+
+        $('#might-like-next').on("click", (e) => {
+            let current = $('.might-like-slider-tray').scrollLeft();
+            current = clamp(current + 200);
+            $('.might-like-slider-tray').scrollLeft(current);
+        });
+    }
+
 
     init();
 })();
